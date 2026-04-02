@@ -32,4 +32,4 @@ The application features a minimalist card-based interface with a soft gradient 
 
 ---
 
-*Created with ❤️ for simplicity and speed.*
+*Developed by **REBI group** with ❤️ for simplicity and speed.*

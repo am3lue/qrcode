@@ -198,12 +198,56 @@
             const qrImg = qrcodeContainer.querySelector('img');
             if (!qrImg) return;
 
-            const link = document.createElement('a');
-            link.href = qrImg.src;
-            link.download = 'qrcode.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Create a canvas to draw the frame and QR code
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const padding = 40;
+            const qrSize = 256;
+            
+            canvas.width = qrSize + (padding * 2);
+            canvas.height = qrSize + (padding * 2);
+
+            // Draw background/frame
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw border/frame
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            
+            // Helper for rounded rect
+            const r = 20;
+            const w = canvas.width - 20;
+            const h = canvas.height - 20;
+            const x = 10;
+            const y = 10;
+            
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+            ctx.stroke();
+
+            // Draw QR Code
+            if (qrImg.complete) {
+                ctx.drawImage(qrImg, padding, padding, qrSize, qrSize);
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'qrcode-framed.png';
+                link.click();
+            } else {
+                qrImg.onload = () => {
+                    ctx.drawImage(qrImg, padding, padding, qrSize, qrSize);
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'qrcode-framed.png';
+                    link.click();
+                };
+            }
         }
 
         generateBtn.addEventListener('click', generateQR);

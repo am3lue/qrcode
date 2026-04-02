@@ -100,6 +100,15 @@
             transform: scale(0.98);
         }
 
+        .secondary-btn {
+            background-color: #64748b;
+            margin-top: 1rem;
+        }
+
+        .secondary-btn:hover {
+            background-color: #475569;
+        }
+
         #qrcode {
             margin-top: 2rem;
             display: flex;
@@ -141,6 +150,7 @@
         <button id="generate-btn">Generate QR Code</button>
 
         <div id="qrcode" class="hidden"></div>
+        <button id="download-btn" class="hidden secondary-btn">Download QR Code</button>
     </div>
 
     <!-- QR Code Library CDN -->
@@ -148,6 +158,7 @@
     <script>
         const textInput = document.getElementById('text-input');
         const generateBtn = document.getElementById('generate-btn');
+        const downloadBtn = document.getElementById('download-btn');
         const qrcodeContainer = document.getElementById('qrcode');
         let qrcodeInstance = null;
 
@@ -162,6 +173,7 @@
             // Clear previous QR code
             qrcodeContainer.innerHTML = '';
             qrcodeContainer.classList.remove('hidden');
+            downloadBtn.classList.add('hidden');
 
             // Generate new QR code
             qrcodeInstance = new QRCode(qrcodeContainer, {
@@ -172,9 +184,30 @@
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+
+            // Show download button after a slight delay to ensure the image is rendered
+            setTimeout(() => {
+                const qrImg = qrcodeContainer.querySelector('img');
+                if (qrImg) {
+                    downloadBtn.classList.remove('hidden');
+                }
+            }, 100);
+        }
+
+        function downloadQR() {
+            const qrImg = qrcodeContainer.querySelector('img');
+            if (!qrImg) return;
+
+            const link = document.createElement('a');
+            link.href = qrImg.src;
+            link.download = 'qrcode.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         generateBtn.addEventListener('click', generateQR);
+        downloadBtn.addEventListener('click', downloadQR);
 
         // Allow pressing "Enter" to generate
         textInput.addEventListener('keypress', (e) => {
